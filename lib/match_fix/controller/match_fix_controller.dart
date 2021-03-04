@@ -9,9 +9,6 @@ class MatchFixController extends ResourceController {
   Future<Response> getAllMatchFixs() async {
     final matchFixQuery = Query<MatchFix>(context);
     final matchFixs = await matchFixQuery.fetch();
-    if (matchFixs == null) {
-      return Response.notFound();
-    }
     return Response.ok(matchFixs);
   }
 
@@ -28,11 +25,27 @@ class MatchFixController extends ResourceController {
 
   @Operation.post()
   Future<Response> postMatchFix(
-      @Bind.body(ignore: ['id']) MatchFix matchFix) async {}
+      @Bind.body(ignore: ['id']) MatchFix matchFix) async {
+    final matchFixQuery = Query<MatchFix>(context)..values = matchFix;
+    final insertMatchFix = await matchFixQuery.insert();
+    return Response.ok(insertMatchFix);
+  }
 
   @Operation.put('id')
-  Future<Response> updateMatchFix(@Bind.path('id') int id) async {}
+  Future<Response> updateMatchFix(@Bind.path('id') int id,
+      @Bind.body(ignore: ['id']) MatchFix matchFix) async {
+    final matchFixQuery = Query<MatchFix>(context)
+      ..where((m) => m.id).equalTo(id)
+      ..values = matchFix;
+    final editMatchFix = matchFixQuery.update();
+    return Response.ok(editMatchFix);
+  }
 
   @Operation.delete('id')
-  Future<Response> deleteMatchFix(@Bind.path('id') int id) async {}
+  Future<Response> deleteMatchFix(@Bind.path('id') int id) async {
+    final matchFixQuery = Query<MatchFix>(context)
+      ..where((m) => m.id).equalTo(id);
+    final removeMatchFix = matchFixQuery.delete();
+    return Response.ok(removeMatchFix);
+  }
 }
